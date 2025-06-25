@@ -1,0 +1,82 @@
+[
+    {
+        "guess": "RAISE",
+        "entropy": 5.828703430314298
+    },
+    {
+        "guess": "CARET",
+        "entropy": 5.7987331918514915
+    },
+    {
+        "guess": "TASER",
+        "entropy": 5.7697739244650545
+    },
+    {
+        "guess": "LATER",
+        "entropy": 5.759476460288535
+    },
+    {
+        "guess": "SANER",
+        "entropy": 5.755529059972775
+    },
+    {
+        "guess": "CARTE",
+        "entropy": 5.74645654014735
+    },
+    {
+        "guess": "ALTER",
+        "entropy": 5.745050067202936
+    },
+    {
+        "guess": "ARISE",
+        "entropy": 5.73692387431916
+    },
+    {
+        "guess": "ORATE",
+        "entropy": 5.732188433899222
+    },
+    {
+        "guess": "IRATE",
+        "entropy": 5.729074935310829
+    },
+    {
+        "guess": "CRATE",
+        "entropy": 5.708284125885645
+    },
+    {
+        "guess": "AROSE",
+        "entropy": 5.704837850539852
+    },
+    {
+        "guess": "TRACE",
+        "entropy": 5.6990468170844135
+    },
+    {
+        "guess": "SLATE",
+        "entropy": 5.696054561411098
+    },
+    {
+        "guess": "STARE",
+        "entropy": 5.690368433497167
+    },
+    {
+        "guess": "CATER",
+        "entropy": 5.690250515175861
+    },
+    {
+        "guess": "SNARE",
+        "entropy": 5.6586095568226975
+    },
+    {
+        "guess": "RATED",
+        "entropy": 5.655007608471391
+    },
+    {
+        "guess": "TRADE",
+        "entropy": 5.6534165784363966
+    },
+    {
+        "guess": "LASER",
+        "entropy": 5.652289165496939
+    }
+]
