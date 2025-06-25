@@ -122,6 +122,7 @@ app = FastAPI()
 origins = [
     "http://localhost:5174", # Vite's default port
     "http://127.0.0.1:5174",
+    "https://deluxe-bublanina-f995ed.netlify.app/"
 ]
 
 app.add_middleware(
