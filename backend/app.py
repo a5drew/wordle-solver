@@ -57,33 +57,38 @@ class FeedbackCache:
 
 app_state = {}
 
-def download_and_extract_zip(url: str, extract_to: str):
-    if url.startswith('file:///'): url = url[8:]
-    if os.path.exists(extract_to) and os.listdir(extract_to):
-        print(f"Cache directory '{extract_to}' already exists. Skipping.")
+def extract_local_zip(zip_path: str, extract_to: str):
+    """Extracts a local ZIP file to a specified directory."""
+    if not os.path.exists(zip_path):
+        print(f"Error: Local cache ZIP file not found at '{zip_path}'. Solver will be slow.")
         return
-    print(f"Loading cache from {url}...")
+
+    if os.path.exists(extract_to) and os.listdir(extract_to):
+        print(f"Cache directory '{extract_to}' already exists. Skipping extraction.")
+        return
+
+    print(f"Extracting local cache from {zip_path}...")
     try:
-        if url.startswith('http'):
-            response = requests.get(url, stream=True); response.raise_for_status()
-            zip_content = io.BytesIO(response.content)
-        else:
-            zip_content = url
-        with zipfile.ZipFile(zip_content) as z:
-            os.makedirs(extract_to, exist_ok=True); z.extractall(extract_to)
-        print(f"Cache successfully loaded into '{extract_to}'.")
-    except Exception as e: print(f"An error occurred during cache loading: {e}")
+        with zipfile.ZipFile(zip_path, 'r') as z:
+            os.makedirs(extract_to, exist_ok=True)
+            z.extractall(extract_to)
+        print(f"Cache successfully extracted to '{extract_to}'.")
+    except Exception as e:
+        print(f"An unexpected error occurred during local extraction: {e}")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Handles application startup logic."""
     print("Application startup...")
-    cache_zip_url = os.getenv("CACHE_ZIP_URL")
+    
+    # **MODIFIED:** This now looks for the 'cache_split.zip' file within the project directory.
+    current_dir = os.path.dirname(__file__)
+    local_zip_path = os.path.join(current_dir, "cache_split.zip")
+    
+    # Use a temporary directory that works on both Windows and Linux/Render
     cache_base_dir = os.path.join(os.path.expanduser("~"), "tmp", "wordle_cache")
-    if cache_zip_url:
-        download_and_extract_zip(cache_zip_url, cache_base_dir)
-    else:
-        print("Warning: CACHE_ZIP_URL environment variable not set.")
+    
+    extract_local_zip(local_zip_path, cache_base_dir)
     
     app_state["feedback_cache"] = FeedbackCache(cache_dir=cache_base_dir)
     yield
@@ -100,17 +105,12 @@ def load_wordlist(path: str) -> List[str]:
     try:
         with open(path, 'r') as f: return [line.strip().upper() for line in f if len(line.strip()) == 5]
     except FileNotFoundError: print(f"FATAL ERROR: 'wordlist.txt' not found at '{path}'"); return []
-
 ALL_WORDS = load_wordlist('wordlist.txt')
-# **FIX:** Load the starter_cache.json at startup.
 STARTER_CACHE = []
 try:
-    with open('starter_cache.json', 'r') as f:
-        STARTER_CACHE = json.load(f)
+    with open('starter_cache.json', 'r') as f: STARTER_CACHE = json.load(f)
     print("Successfully loaded starter_cache.json")
-except FileNotFoundError:
-    print("Warning: 'starter_cache.json' not found. Initial suggestions will be calculated live.")
-
+except FileNotFoundError: print("Warning: 'starter_cache.json' not found.")
 
 # --- Solver Functions ---
 def filter_candidates(candidates: List[str], guess: str, feedback: str) -> List[str]:
@@ -129,14 +129,10 @@ def calculate_expected_entropy(guess: str, candidates: List[str]) -> float:
 
 def get_ranked_suggestions(candidates: List[str]) -> List[str]:
     if not candidates: return []
-
-    # **FIX:** If the candidate list is the full wordlist (i.e., it's the start of the game),
-    # immediately return the pre-computed starter words from the cache.
     if len(candidates) == len(ALL_WORDS) and STARTER_CACHE:
         print("Using starter cache for initial suggestion.")
         return [item['guess'] for item in STARTER_CACHE]
-
-    # Otherwise, proceed with the live calculation.
+    
     print(f"Calculating suggestions for {len(candidates)} candidates.")
     suggestions, search_space = [], candidates if len(candidates) <= 30 else ALL_WORDS
     for guess in search_space:
@@ -154,7 +150,7 @@ class SuggestionResponse(BaseModel):
     suggestions: List[str]
 
 # --- CORS Middleware ---
-origins = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:5174,http://127.0.0.1:5173,http://127.0.0.1:5174").split(",")
+origins = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:5174,http://127.0.0.1:5173,http://127.0.0.1:5174,https://deluxe-bublanina-f995ed.netlify.app").split(",")
 app.add_middleware(CORSMiddleware, allow_origins=origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
 # --- API Endpoints ---
