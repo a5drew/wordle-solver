@@ -4,7 +4,7 @@ import { CheckCircle, XCircle, RefreshCw, Sun, Loader2, ServerCrash, HelpCircle,
 
 // --- API Configuration ---
 // Updated to fix the compilation error. In a real build process, this would use environment variables.
-const API_URL = 'http://localhost:8000';
+const API_URL = 'https://wordle-solver-api.onrender.com';
 
 // --- COMPONENT: Background ---
 const StaticGradientBackground = () => (
