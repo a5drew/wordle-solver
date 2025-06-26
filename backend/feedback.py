@@ -1,10 +1,6 @@
-# engine/feedback.py
-
 from functools import lru_cache
-from engine.utils import load_pickle_cache
-
-# This version is robust: it tries to load the cache,
-# but falls back to calculating if the cache doesn't exist.
+# FIXED: Changed 'from engine.utils' to 'from utils'
+from utils import load_pickle_cache
 
 FEEDBACK_CACHE = load_pickle_cache('feedback_cache.pkl')
 
@@ -37,6 +33,8 @@ def get_feedback(guess: str, secret: str) -> str:
         try:
             return FEEDBACK_CACHE[guess][secret]
         except KeyError:
+            # Fallback for words not in the pre-computed cache
             return _calculate_feedback(guess, secret)
     else:
+        # Fallback if the cache file doesn't exist at all
         return _calculate_feedback(guess, secret)

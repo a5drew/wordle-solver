@@ -1,4 +1,3 @@
-# engine/utils.py
 import logging
 from typing import List
 import pickle
@@ -7,7 +6,6 @@ def load_wordlist(path: str) -> List[str]:
     """Loads a wordlist from a file, ensuring words are uppercase."""
     try:
         with open(path, 'r') as f:
-            # .strip() removes whitespace, .upper() standardizes case
             return [line.strip().upper() for line in f if len(line.strip()) == 5]
     except FileNotFoundError:
         print(f"Error: Wordlist file not found at '{path}'")
@@ -30,12 +28,3 @@ def load_pickle_cache(path: str):
         logging.error(f"Cache file not found at: {path}")
         logging.error("Please run 'precompute_cache.py' to generate caches.")
         return None
-
-# This block lets us test the file directly
-if __name__ == '__main__':
-    print("Testing word loader...")
-    # We assume wordlist.txt is in the parent directory
-    words = load_wordlist('../wordlist.txt')
-    if words:
-        print(f"Successfully loaded {len(words)} words.")
-        print("First 5 words:", words[:5])
